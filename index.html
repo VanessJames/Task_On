@@ -10,9 +10,34 @@
     <!-- Font Awesome cdn css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="./styles.css">
-    <title>Duty Roster</title>
+    <title>Task_On</title>
 </head>
 <body>
     
+    <header>
+        <h1>My Roster</h1>
+        <label class="switch">
+            <input type="checkbox" id="dark-mode-toggle">
+            <span class="slider round"></span>
+    </header>
+    <form action="">
+        <input type="text" class="roster-input">
+        <button class="roster-button" type="submit">
+            <i class="fas fa-plus-circle fa-lg"></i>
+        </button>
+        <div class="select">
+            <select name="rosters" class="filter-roster">
+                <option value="all">All</option>
+                <option value="completed">Completed</option>
+                <option value="incomplete">Incomplete</option>
+            </select>
+        </div>
+    </form>
+
+    <div class="roster-container">
+        <ul class="roster-list"></ul>
+    </div>
+
+    <script src="./script.js"></script>
 </body>
 </html>
