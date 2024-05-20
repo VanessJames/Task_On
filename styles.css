@@ -120,6 +120,48 @@ form button:hover {
     background-color: rgb(169, 98, 0);
 }
 
+.priority-select {
+    padding: 0.5rem;
+    margin-left: 0.5rem;
+    border: none;
+    background: white;
+    border-radius: 2rem;
+    font-size: 1.2rem;
+    color: rgb(255, 200, 0);
+}
+
+.priority-select.dark-mode {
+    background-color: #555;
+    color: #f9f9f9;
+    border: 1px solid #666;
+}
+
+.priority-level {
+    font-size: 1rem;
+    margin-left: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+}
+
+.priority-low {
+    background-color: green;
+    color: white;
+}
+
+.priority-medium {
+    background-color: orange;
+    color: white;
+}
+
+.priority-high {
+    background-color: red;
+    color: white;
+}
+
+.priority-level.dark-mode {
+    border: 1px solid #666;
+}
+
 .roster-item {
     padding: 0rem 0.5rem;
 }

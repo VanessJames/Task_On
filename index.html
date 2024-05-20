@@ -19,9 +19,15 @@
         <label class="switch">
             <input type="checkbox" id="dark-mode-toggle">
             <span class="slider round"></span>
+        </label>
     </header>
     <form action="">
-        <input type="text" class="roster-input">
+        <input type="text" class="roster-input" placeholder="Add New Task">
+        <select name="priority" class="priority-select">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
         <button class="roster-button" type="submit">
             <i class="fas fa-plus-circle fa-lg"></i>
         </button>

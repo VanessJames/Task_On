@@ -1,4 +1,5 @@
 const rosterInput = document.querySelector(".roster-input");
+const prioritySelect = document.querySelector(".priority-select");
 const rosterButton = document.querySelector(".roster-button");
 const rosterList = document.querySelector(".roster-list");
 const filterOption = document.querySelector(".filter-roster");
@@ -20,6 +21,7 @@ let editElement;
 function addRoster(event) {
     event.preventDefault();
     const rosterInput = document.querySelector(".roster-input");
+    const priority = prioritySelect.value;
 
     if (!editFlag) {
         const rosterDiv = document.createElement("div");
@@ -30,6 +32,11 @@ function addRoster(event) {
         newRoster.innerText = rosterInput.value; 
         newRoster.classList.add("roster-item");
         rosterDiv.appendChild(newRoster);
+
+        const priorityLabel = document.createElement("span");
+        priorityLabel.innerText = priority;
+        priorityLabel.classList.add("priority-level", `priority-${priority.toLowerCase()}`);
+        rosterDiv.appendChild(priorityLabel);
 
     //ADDING TO LOCAL STORAGE 
     saveLocalRosters(rosterInput.value);
@@ -56,7 +63,9 @@ function addRoster(event) {
 }
     else {
         editElement.innerText = rosterInput.value;
-        updateLocalRosters(editElement);
+        editElement.nextSibling.innerText = priority;
+        editElement.nextSibling.className = `priority-level priority-${priority.toLowerCase()}`;
+        updateLocalRosters(editElement, priority);
         editFlag = false;
         rosterInput.value = "";
 }
@@ -84,6 +93,7 @@ function deleteCheck(e) {
         editFlag = true;
         editElement = item.parentElement.querySelector(".roster-item");
         rosterInput.value = editElement.innerText;
+        prioritySelect.value = item.parentElement.querySelector(".priority-level").innerText;
     }
 }
 
@@ -129,6 +139,11 @@ function getLocalRosters() {
         newRoster.classList.add("roster-item");
         rosterDiv.appendChild(newRoster);
 
+        const priorityLabel = document.createElement("span");
+        priorityLabel.innerText = rosterObj.priority;
+        priorityLabel.classList.add("priority-level", `priority-${rosterObj.priority.toLowerCase()}`);
+        rosterDiv.appendChild(priorityLabel);
+
         const completedButton = document.createElement("button");
         completedButton.innerHTML = '<i class="fas fa-check-circle"></i>';
         completedButton.classList.add("complete-btn");
@@ -155,15 +170,11 @@ function removeLocalRosters(roster) {
     localStorage.setItem("rosters", JSON.stringify(rosters));
     }
 
-    function updateLocalRosters(editElement) {
+    function updateLocalRosters(editElement, newPriority) {
         let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-    const oldRoster = editElement.dataset.oldValue;
-    const newRoster = editElement.innerText;
-    const index = rosters.indexOf(oldRoster);
-    if (index !== -1) {
-        rosters[index] = newRoster;
-    }
-    localStorage.setItem("rosters", JSON.stringify(rosters));
+        const oldRoster = editElement.innerText;
+        rosters = rosters.map(r => r.task === oldRoster ? { task: oldRoster, priority: newPriority } : r);
+        localStorage.setItem("rosters", JSON.stringify(rosters));
     }
 
     function toggleDarkMode() {
@@ -172,10 +183,12 @@ function removeLocalRosters(roster) {
         document.querySelector(".roster-input").classList.toggle("dark-mode");
         document.querySelector(".roster-button").classList.toggle("dark-mode");
         document.querySelector(".filter-roster").classList.toggle("dark-mode");
+        document.querySelector(".priority-select").classList.toggle("dark-mode");
     
         const rosters = document.querySelectorAll(".roster");
         rosters.forEach(roster => {
             roster.classList.toggle("dark-mode");
+            roster.querySelector(".priority-level").classList.toggle("dark-mode");
         });
     
         saveDarkModePreference();
@@ -194,10 +207,12 @@ function removeLocalRosters(roster) {
             document.querySelector(".roster-input").classList.add("dark-mode");
             document.querySelector(".roster-button").classList.add("dark-mode");
             document.querySelector(".filter-roster").classList.add("dark-mode");
+            document.querySelector(".priority-select").classList.add("dark-mode");
     
             const rosters = document.querySelectorAll(".roster");
             rosters.forEach(roster => {
                 roster.classList.add("dark-mode");
+                roster.querySelector(".priority-level").classList.add("dark-mode");
             });
         }
     }
