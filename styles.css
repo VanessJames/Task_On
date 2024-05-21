@@ -276,6 +276,25 @@ body.dark-mode {
     background-color: #444;
 }
 
+/* Search bar */
+.search-bar {
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: none;
+    border-radius: 2rem;
+    font-size: 1.2rem;
+    background: white;
+    color: black;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar.dark-mode {
+    background-color: #555;
+    color: #f9f9f9;
+    border: 1px solid #666;
+}
+
 .roster-input.dark-mode, .roster-button.dark-mode, .select.dark-mode select.dark-mode {
     background-color: #555;
     color: #f9f9f9;

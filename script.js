@@ -3,6 +3,7 @@ const prioritySelect = document.querySelector(".priority-select");
 const rosterButton = document.querySelector(".roster-button");
 const rosterList = document.querySelector(".roster-list");
 const filterOption = document.querySelector(".filter-roster");
+const searchBar = document.querySelector(".search-bar");
 
 document.addEventListener("DOMContentLoaded", () => {
     getLocalRosters();
@@ -14,6 +15,7 @@ document.querySelector(".roster-button").addEventListener("click", addRoster);
 document.querySelector(".roster-list").addEventListener("click", deleteCheck);
 document.querySelector(".filter-roster").addEventListener("change", filterRoster);
 document.getElementById("dark-mode-toggle").addEventListener("click", toggleDarkMode);
+searchBar.addEventListener("input", searchRosters);
 
 let editFlag = false;
 let editElement;
@@ -215,4 +217,18 @@ function removeLocalRosters(roster) {
                 roster.querySelector(".priority-level").classList.add("dark-mode");
             });
         }
+    }
+
+    function searchRosters() {
+        const searchTerm = searchBar.value.toLowerCase();
+        const rosters = rosterList.childNodes;
+    
+        rosters.forEach(roster => {
+            const rosterText = roster.querySelector(".roster-item").innerText.toLowerCase();
+            if (rosterText.includes(searchTerm)) {
+                roster.style.display = "flex";
+            } else {
+                roster.style.display = "none";
+            }
+        });
     }
