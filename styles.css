@@ -5,10 +5,18 @@
 }
 
 body {
-    background-color: mediumslateblue;
+    background: url('images/abstract-black-futuristic-background-panoramic-texture-ai-generated-image-photo.jpg') no-repeat center center fixed; 
+    background-size: cover;
     color: white;
     font-family: "Poppins", sans-serif;
     min-height: 100vh;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background: url('images/abstract-black-futuristic-background-panoramic-texture-ai-generated-image-photo.jpg') no-repeat center center fixed; 
+    background-size: cover;
+    color: white;
 }
 
 header {
