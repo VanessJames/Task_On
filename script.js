@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadDarkMode();
 });
 
+
 document.querySelector(".roster-button").addEventListener("click", addRoster);
 document.querySelector(".roster-list").addEventListener("click", deleteCheck);
 document.querySelector(".filter-roster").addEventListener("change", filterRoster);
@@ -204,11 +205,11 @@ function updateLocalRosters(originalTask, newTask, newPriority) {
 
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
-    document.querySelector(".container").classList.toggle("dark-mode");
     document.querySelector(".roster-input").classList.toggle("dark-mode");
     document.querySelector(".roster-button").classList.toggle("dark-mode");
     document.querySelector(".filter-roster").classList.toggle("dark-mode");
     document.querySelector(".priority-select").classList.toggle("dark-mode");
+    document.querySelector(".search-bar").classList.toggle("dark-mode");
 
     const rosters = document.querySelectorAll(".roster");
     rosters.forEach(roster => {
@@ -217,11 +218,6 @@ function toggleDarkMode() {
     });
 
     saveDarkModePreference();
-}
-
-function saveDarkModePreference() {
-    const darkModeEnabled = document.body.classList.contains("dark-mode");
-    localStorage.setItem("dark-mode", darkModeEnabled);
 }
 
 function loadDarkMode() {
@@ -233,6 +229,7 @@ function loadDarkMode() {
         document.querySelector(".roster-button").classList.add("dark-mode");
         document.querySelector(".filter-roster").classList.add("dark-mode");
         document.querySelector(".priority-select").classList.add("dark-mode");
+        document.querySelector(".search-bar").classList.add("dark-mode");
 
         const rosters = document.querySelectorAll(".roster");
         rosters.forEach(roster => {
@@ -240,6 +237,20 @@ function loadDarkMode() {
             roster.querySelector(".priority-level").classList.add("dark-mode");
         });
     }
+}
+
+
+function loadDarkMode() {
+    const darkModeEnabled = localStorage.getItem("dark-mode") === "true";
+    if (darkModeEnabled) {
+        document.getElementById("dark-mode-toggle").checked = true;
+        toggleDarkMode();  // This will add all necessary dark mode classes
+    }
+}
+
+function saveDarkModePreference() {
+    const darkModeEnabled = document.body.classList.contains("dark-mode");
+    localStorage.setItem("dark-mode", darkModeEnabled);
 }
 
 function searchRosters() {

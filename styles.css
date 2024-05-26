@@ -12,13 +12,6 @@ body {
     min-height: 100vh;
 }
 
-/* Dark mode styles */
-body.dark-mode {
-    background: url('images/wood.jpg') no-repeat center center fixed; 
-    background-size: cover;
-    color: white;
-}
-
 header {
     font-size: 1.5rem;
 }
@@ -138,12 +131,6 @@ form button:hover {
     color: rgb(255, 200, 0);
 }
 
-.priority-select.dark-mode {
-    background-color: #555;
-    color: #f9f9f9;
-    border: 1px solid #666;
-}
-
 .priority-level {
     font-size: 1rem;
     margin-left: 0.5rem;
@@ -164,10 +151,6 @@ form button:hover {
 .priority-high {
     background-color: red;
     color: white;
-}
-
-.priority-level.dark-mode {
-    border: 1px solid #666;
 }
 
 .roster-item {
@@ -274,15 +257,29 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-/* Dark Mode Styles */
+/* Dark mode styles */
 body.dark-mode {
-    background-color: #333;
-    color: #f9f9f9;
+    background: url('images/Dark wood.jpg') no-repeat center center fixed; 
+    background-size: cover;
+    color: white;
 }
 
-.container.dark-mode {
-    background-color: #444;
+.priority-select.dark-mode, .priority-level.dark-mode, .search-bar.dark-mode,
+.roster-input.dark-mode, .roster-button.dark-mode, .select.dark-mode select.dark-mode, select.filter-roster.dark-mode {
+    background-color: #555;
+    color: #f9f9f9;
+    border: 1px solid #666;
 }
+
+.roster.dark-mode {
+    background-color: #444;
+    border-bottom: 1px solid #555;
+}
+
+.roster-button.dark-mode:hover {
+    background-color: #288028;
+}
+
 
 /* Search bar */
 .search-bar {
@@ -295,24 +292,4 @@ body.dark-mode {
     background: white;
     color: black;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.search-bar.dark-mode {
-    background-color: #555;
-    color: #f9f9f9;
-    border: 1px solid #666;
-}
-
-.roster-input.dark-mode, .roster-button.dark-mode, .select.dark-mode select.dark-mode {
-    background-color: #555;
-    color: #f9f9f9;
-    border: 1px solid #666;
-}
-
-.roster.dark-mode {
-    border-bottom: 1px solid #555;
-}
-
-.roster-button.dark-mode:hover {
-    background-color: #288028;
 }
