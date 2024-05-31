@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ email, username, password })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.statusText}`);
+                }
+
                 const data = await response.json();
                 console.log('Response status:', response.status);
                 console.log('Response data:', data);
@@ -31,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                alert('Registration failed');
+                alert('Registration failed: ' + error.message);
             }
         });
     }
@@ -39,22 +43,26 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loginForm) {
         loginForm.addEventListener('submit', async function(event) {
             event.preventDefault();
-            const email = document.getElementById('login-email').value;
+            const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
-    
+
             try {
                 const response = await fetch('http://localhost:5000/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ username, password })
                 });
-    
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.statusText}`);
+                }
+
                 const data = await response.json();
                 console.log('Response status:', response.status);
                 console.log('Response data:', data);
-    
+
                 if (response.status === 200) {
                     localStorage.setItem('token', data.token);
                     console.log('Token set in localStorage:', data.token);
@@ -66,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                alert('Login failed');
+                alert('Login failed: ' + error.message);
             }
         });
     }
@@ -85,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
             taskSection.style.display = 'none';
         }
     }
-    
+
     async function fetchWithAuth(url, options = {}) {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No token found');
@@ -94,19 +102,17 @@ document.addEventListener('DOMContentLoaded', function() {
         options.headers = {
             ...options.headers,
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'  // Ensuring content type is set
+            'Content-Type': 'application/json'
         };
-    
-    
+
         const response = await fetch(url, options);
-         if (response.status === 401) {
+        if (response.status === 401) {
             alert('Unauthorized. Please log in again.');
             localStorage.removeItem('token');
             updateUI();
         }
         return response;
     }
-    
 
     async function loadTasks() {
         try {
@@ -117,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading tasks:', error);
         }
     }
-    
 
     if (taskForm) {
         taskForm.addEventListener('submit', async function(event) {
@@ -134,6 +139,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ task, priority })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.statusText}`);
+                }
+
                 console.log('Response status:', response.status);
                 const data = await response.json();
                 console.log('Response data:', data);
@@ -146,11 +155,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Task creation error:', error);
-                alert('Task creation failed');
+                alert('Task creation failed: ' + error.message);
             }
         });
     }
-
 
     function displayTask(task) {
         const rosterDiv = document.createElement("div");
