@@ -1,31 +1,158 @@
-const rosterInput = document.querySelector(".roster-input");
-const prioritySelect = document.querySelector(".priority-select");
-const rosterButton = document.querySelector(".roster-button");
-const rosterList = document.querySelector(".roster-list");
-const filterOption = document.querySelector(".filter-roster");
-const searchBar = document.querySelector(".search-bar");
+document.addEventListener('DOMContentLoaded', function() {
+    const registerForm = document.getElementById('register-form');
+    const loginForm = document.getElementById('login-form');
+    const taskForm = document.getElementById('task-form');
+    const rosterList = document.getElementById('roster-list');
 
-document.addEventListener("DOMContentLoaded", () => {
-    getLocalRosters();
-    loadDarkMode();
-});
+    if (registerForm) {
+        registerForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
 
-document.querySelector(".roster-button").addEventListener("click", addRoster);
-document.querySelector(".roster-list").addEventListener("click", deleteCheck);
-document.querySelector(".filter-roster").addEventListener("change", filterRoster);
-document.getElementById("dark-mode-toggle").addEventListener("click", toggleDarkMode);
-searchBar.addEventListener("input", searchRosters);
+            try {
+                const response = await fetch('http://localhost:5000/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, username, password })
+                });
 
-let editFlag = false;
-let editElement;
+                const data = await response.json();
+                console.log('Response status:', response.status);
+                console.log('Response data:', data);
 
-function addRoster(event) {
-    event.preventDefault();
-    const rosterInput = document.querySelector(".roster-input");
-    const priority = prioritySelect.value;
+                if (response.status === 201) {
+                    alert('Registration successful!');
+                } else {
+                    alert('Registration error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration failed');
+            }
+        });
+    }
 
-    if (!editFlag) {
-        // Adding a new task
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+    
+            try {
+                const response = await fetch('http://localhost:5000/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+    
+                const data = await response.json();
+                console.log('Response status:', response.status);
+                console.log('Response data:', data);
+    
+                if (response.status === 200) {
+                    localStorage.setItem('token', data.token);
+                    console.log('Token set in localStorage:', data.token);
+                    alert('Login successful!');
+                    updateUI();
+                } else {
+                    console.log('Login error details:', data);
+                    alert('Login error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed');
+            }
+        });
+    }
+
+    function updateUI() {
+        const token = localStorage.getItem('token');
+        const authSection = document.getElementById('auth-section');
+        const taskSection = document.getElementById('task-section');
+
+        if (token) {
+            authSection.style.display = 'none';
+            taskSection.style.display = 'block';
+            loadTasks();
+        } else {
+            authSection.style.display = 'block';
+            taskSection.style.display = 'none';
+        }
+    }
+    
+    async function fetchWithAuth(url, options = {}) {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found');
+
+        console.log('Retrieved token from localStorage:', token);
+        options.headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'  // Ensuring content type is set
+        };
+    
+    
+        const response = await fetch(url, options);
+         if (response.status === 401) {
+            alert('Unauthorized. Please log in again.');
+            localStorage.removeItem('token');
+            updateUI();
+        }
+        return response;
+    }
+    
+
+    async function loadTasks() {
+        try {
+            const response = await fetchWithAuth('http://localhost:5000/tasks');
+            const tasks = await response.json();
+            tasks.forEach(displayTask);
+        } catch (error) {
+            console.error('Error loading tasks:', error);
+        }
+    }
+    
+
+    if (taskForm) {
+        taskForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const task = document.getElementById('task').value;
+            const priority = document.getElementById('priority').value;
+
+            try {
+                const response = await fetchWithAuth('http://localhost:5000/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ task, priority })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.status === 201) {
+                    displayTask(data);
+                    alert('Task created successfully!');
+                } else {
+                    alert('Task creation error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Task creation error:', error);
+                alert('Task creation failed');
+            }
+        });
+    }
+
+
+    function displayTask(task) {
         const rosterDiv = document.createElement("div");
         rosterDiv.classList.add("roster");
 
@@ -55,201 +182,8 @@ function addRoster(event) {
         trashButton.classList.add("trash-btn");
         rosterDiv.appendChild(trashButton);
 
-        document.querySelector(".roster-list").appendChild(rosterDiv);
-        rosterInput.value = "";
-    } else {
-        // Editing an existing task
-        const originalTask = editElement.dataset.task; // Get the original task name
-        editElement.innerText = rosterInput.value;
-        editElement.dataset.task = rosterInput.value; // Update dataset with new task name
-        editElement.nextSibling.innerText = priority;
-        editElement.nextSibling.className = `priority-level priority-${priority.toLowerCase()}`;
-        updateLocalRosters(originalTask, rosterInput.value, priority); // Pass the original and new task names
-        editFlag = false;
-        rosterInput.value = "";
-    }
-}
-
-
-
-function deleteCheck(e) {
-    const item = e.target;
-    const rosterInput = document.querySelector(".roster-input");
-
-    if (item.classList.contains("trash-btn")) {
-        const roster = item.parentElement;
-        roster.classList.add("slide");
-        removeLocalRosters(roster);
-        roster.addEventListener("transitionend", function() {
-            roster.remove();
-        });
+        rosterList.appendChild(rosterDiv);
     }
 
-    if (item.classList.contains("complete-btn")) {
-        const roster = item.parentElement;
-        roster.classList.toggle("completed");
-    }
-
-    if (item.classList.contains("edit-btn")) {
-        editFlag = true;
-        editElement = item.parentElement.querySelector(".roster-item");
-        rosterInput.value = editElement.innerText;
-        prioritySelect.value = item.parentElement.querySelector(".priority-level").innerText;
-    }
-}
-
-function filterRoster(e) {
-    const rosters = rosterList.childNodes;
-    rosters.forEach(function(roster) {
-        switch(e.target.value) {
-            case "all": 
-                roster.style.display = "flex";
-                break;
-            case "completed": 
-                if(roster.classList.contains("completed")) {
-                    roster.style.display = "flex";
-                } else {
-                    roster.style.display = "none";
-                }
-                break;
-            case "incomplete":
-                if(!roster.classList.contains("completed")) {
-                    roster.style.display = "flex";
-                } else {
-                    roster.style.display = "none";
-                }
-                break;
-        }
-    });
-}
-
-function saveLocalRosters(task, priority) {
-    if (task && priority) {
-        let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-        // Check if the task already exists
-        const existingTask = rosters.find(roster => roster.task === task);
-        if (!existingTask) {
-            rosters.push({ task, priority });
-            localStorage.setItem("rosters", JSON.stringify(rosters));
-        } else {
-            console.warn("Task already exists:", task);
-        }
-    } else {
-        console.error("Task or priority is missing", { task, priority });
-    }
-}
-
-
-function getLocalRosters() {
-    rosterList.innerHTML = ""; // Clear existing tasks to prevent duplicates
-    let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-    rosters.forEach(function (rosterObj) {
-        if (rosterObj && typeof rosterObj.task === 'string' && typeof rosterObj.priority === 'string') {
-            const rosterDiv = document.createElement("div");
-            rosterDiv.classList.add("roster");
-
-            const newRoster = document.createElement("li");
-            newRoster.innerText = rosterObj.task;
-            newRoster.classList.add("roster-item");
-            newRoster.dataset.task = rosterObj.task; // Store original task name
-            rosterDiv.appendChild(newRoster);
-
-            const priorityLabel = document.createElement("span");
-            priorityLabel.innerText = rosterObj.priority;
-            priorityLabel.classList.add("priority-level", `priority-${rosterObj.priority.toLowerCase()}`);
-            rosterDiv.appendChild(priorityLabel);
-
-            const completedButton = document.createElement("button");
-            completedButton.innerHTML = '<i class="fas fa-check-circle"></i>';
-            completedButton.classList.add("complete-btn");
-            rosterDiv.appendChild(completedButton);
-
-            const editButton = document.createElement("button");
-            editButton.innerHTML = '<i class="fas fa-edit"></i>';
-            editButton.classList.add("edit-btn");
-            rosterDiv.appendChild(editButton);
-
-            const trashButton = document.createElement("button");
-            trashButton.innerHTML = '<i class="fas fa-trash"></i>';
-            trashButton.classList.add("trash-btn");
-            rosterDiv.appendChild(trashButton);
-
-            document.querySelector(".roster-list").appendChild(rosterDiv);
-        } else {
-            console.error("Invalid roster object:", rosterObj);
-        }
-    });
-}
-
-
-
-
-function removeLocalRosters(roster) {
-    let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-    const rosterIndex = roster.children[0].innerText;
-    rosters = rosters.filter(roster => roster.task !== rosterIndex);
-    localStorage.setItem("rosters", JSON.stringify(rosters));
-}
-
-function updateLocalRosters(originalTask, newTask, newPriority) {
-    let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-    rosters = rosters.map(roster => roster.task === originalTask ? { task: newTask, priority: newPriority } : roster);
-    localStorage.setItem("rosters", JSON.stringify(rosters));
-}
-
-
-
-
-function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-    document.querySelector(".container").classList.toggle("dark-mode");
-    document.querySelector(".roster-input").classList.toggle("dark-mode");
-    document.querySelector(".roster-button").classList.toggle("dark-mode");
-    document.querySelector(".filter-roster").classList.toggle("dark-mode");
-    document.querySelector(".priority-select").classList.toggle("dark-mode");
-
-    const rosters = document.querySelectorAll(".roster");
-    rosters.forEach(roster => {
-        roster.classList.toggle("dark-mode");
-        roster.querySelector(".priority-level").classList.toggle("dark-mode");
-    });
-
-    saveDarkModePreference();
-}
-
-function saveDarkModePreference() {
-    const darkModeEnabled = document.body.classList.contains("dark-mode");
-    localStorage.setItem("dark-mode", darkModeEnabled);
-}
-
-function loadDarkMode() {
-    const darkModeEnabled = localStorage.getItem("dark-mode") === "true";
-    if (darkModeEnabled) {
-        document.body.classList.add("dark-mode");
-        document.querySelector(".container").classList.add("dark-mode");
-        document.querySelector(".roster-input").classList.add("dark-mode");
-        document.querySelector(".roster-button").classList.add("dark-mode");
-        document.querySelector(".filter-roster").classList.add("dark-mode");
-        document.querySelector(".priority-select").classList.add("dark-mode");
-
-        const rosters = document.querySelectorAll(".roster");
-        rosters.forEach(roster => {
-            roster.classList.add("dark-mode");
-            roster.querySelector(".priority-level").classList.add("dark-mode");
-        });
-    }
-}
-
-function searchRosters() {
-    const searchTerm = searchBar.value.toLowerCase();
-    const rosters = rosterList.childNodes;
-
-    rosters.forEach(roster => {
-        const rosterText = roster.querySelector(".roster-item").innerText.toLowerCase();
-        if (rosterText.includes(searchTerm)) {
-            roster.style.display = "flex";
-        } else {
-            roster.style.display = "none";
-        }
-    });
-}
+    updateUI();
+});
