@@ -1,222 +1,123 @@
+// Select DOM Elements
 const rosterInput = document.querySelector(".roster-input");
 const prioritySelect = document.querySelector(".priority-select");
 const rosterButton = document.querySelector(".roster-button");
 const rosterList = document.querySelector(".roster-list");
 const filterOption = document.querySelector(".filter-roster");
 const searchBar = document.querySelector(".search-bar");
+const darkModeToggle = document.getElementById("dark-mode-toggle");
 
+// Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
     getLocalRosters();
     loadDarkMode();
 });
 
-
-document.querySelector(".roster-button").addEventListener("click", addRoster);
-document.querySelector(".roster-list").addEventListener("click", deleteCheck);
-document.querySelector(".filter-roster").addEventListener("change", filterRoster);
-document.getElementById("dark-mode-toggle").addEventListener("click", toggleDarkMode);
+rosterButton.addEventListener("click", addRoster);
+rosterList.addEventListener("click", deleteCheck);
+filterOption.addEventListener("change", filterRoster);
+darkModeToggle.addEventListener("change", toggleDarkMode);
 searchBar.addEventListener("input", searchRosters);
 
+// Global variables
 let editFlag = false;
 let editElement;
 
+// Functions
 function addRoster(event) {
     event.preventDefault();
-    const rosterInput = document.querySelector(".roster-input");
+    const task = rosterInput.value.trim();
     const priority = prioritySelect.value;
+
+    if (task === "") {
+        alert("Task cannot be empty");
+        return;
+    }
 
     if (!editFlag) {
         // Adding a new task
-        const rosterDiv = document.createElement("div");
-        rosterDiv.classList.add("roster");
-
-        const newRoster = document.createElement("li");
-        newRoster.innerText = rosterInput.value; 
-        newRoster.classList.add("roster-item");
-        newRoster.dataset.task = rosterInput.value; // Store original task name
-        rosterDiv.appendChild(newRoster);
-
-        const priorityLabel = document.createElement("span");
-        priorityLabel.innerText = priority;
-        priorityLabel.classList.add("priority-level", `priority-${priority.toLowerCase()}`);
-        rosterDiv.appendChild(priorityLabel);
-
-        saveLocalRosters(rosterInput.value, priority); // Pass the priority here
-
-        const completedButton = document.createElement("button");
-        completedButton.innerHTML = '<i class="fas fa-check-circle"></i>';
-        completedButton.classList.add("complete-btn");
-        rosterDiv.appendChild(completedButton);
-
-        const editButton = document.createElement("button");
-        editButton.innerHTML = '<i class="fas fa-edit"></i>';
-        editButton.classList.add("edit-btn");
-        rosterDiv.appendChild(editButton);
-
-        const trashButton = document.createElement("button");
-        trashButton.innerHTML = '<i class="fas fa-trash"></i>';
-        trashButton.classList.add("trash-btn");
-        rosterDiv.appendChild(trashButton);
-
-        document.querySelector(".roster-list").appendChild(rosterDiv);
-        rosterInput.value = "";
+        createRosterElement(task, priority);
+        saveLocalRosters(task, priority);
     } else {
         // Editing an existing task
-        const originalTask = editElement.dataset.task; // Get the original task name
-        editElement.innerText = rosterInput.value;
-        editElement.dataset.task = rosterInput.value; // Update dataset with new task name
+        const originalTask = editElement.dataset.task;
+        editElement.innerText = task;
+        editElement.dataset.task = task;
         editElement.nextSibling.innerText = priority;
         editElement.nextSibling.className = `priority-level priority-${priority.toLowerCase()}`;
-        updateLocalRosters(originalTask, rosterInput.value, priority); // Pass the original and new task names
+        updateLocalRosters(originalTask, task, priority);
         editFlag = false;
-        rosterInput.value = "";
     }
+    rosterInput.value = "";
 }
 
-
-
-function deleteCheck(e) {
-    const item = e.target;
-    const rosterInput = document.querySelector(".roster-input");
+function deleteCheck(event) {
+    const item = event.target;
+    const roster = item.parentElement;
 
     if (item.classList.contains("trash-btn")) {
-        const roster = item.parentElement;
         roster.classList.add("slide");
         removeLocalRosters(roster);
-        roster.addEventListener("transitionend", function() {
-            roster.remove();
-        });
-    }
-
-    if (item.classList.contains("complete-btn")) {
-        const roster = item.parentElement;
+        roster.addEventListener("transitionend", () => roster.remove());
+    } else if (item.classList.contains("complete-btn")) {
         roster.classList.toggle("completed");
-    }
-
-    if (item.classList.contains("edit-btn")) {
+    } else if (item.classList.contains("edit-btn")) {
         editFlag = true;
-        editElement = item.parentElement.querySelector(".roster-item");
+        editElement = roster.querySelector(".roster-item");
         rosterInput.value = editElement.innerText;
-        prioritySelect.value = item.parentElement.querySelector(".priority-level").innerText;
+        prioritySelect.value = roster.querySelector(".priority-level").innerText;
     }
 }
 
-function filterRoster(e) {
-    const rosters = rosterList.childNodes;
-    rosters.forEach(function(roster) {
-        switch(e.target.value) {
-            case "all": 
+function filterRoster(event) {
+    const filter = event.target.value;
+    const rosters = Array.from(rosterList.children);
+    rosters.forEach(roster => {
+        switch (filter) {
+            case "all":
                 roster.style.display = "flex";
                 break;
-            case "completed": 
-                if(roster.classList.contains("completed")) {
-                    roster.style.display = "flex";
-                } else {
-                    roster.style.display = "none";
-                }
+            case "completed":
+                roster.style.display = roster.classList.contains("completed") ? "flex" : "none";
                 break;
             case "incomplete":
-                if(!roster.classList.contains("completed")) {
-                    roster.style.display = "flex";
-                } else {
-                    roster.style.display = "none";
-                }
+                roster.style.display = roster.classList.contains("completed") ? "none" : "flex";
                 break;
         }
     });
 }
 
 function saveLocalRosters(task, priority) {
-    if (task && priority) {
-        let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-        // Check if the task already exists
-        const existingTask = rosters.find(roster => roster.task === task);
-        if (!existingTask) {
-            rosters.push({ task, priority });
-            localStorage.setItem("rosters", JSON.stringify(rosters));
-        } else {
-            console.warn("Task already exists:", task);
-        }
+    let rosters = JSON.parse(localStorage.getItem("rosters")) || [];
+    if (!rosters.some(roster => roster.task === task)) {
+        rosters.push({ task, priority });
+        localStorage.setItem("rosters", JSON.stringify(rosters));
     } else {
-        console.error("Task or priority is missing", { task, priority });
+        console.warn("Task already exists:", task);
     }
 }
 
-
 function getLocalRosters() {
     rosterList.innerHTML = ""; // Clear existing tasks to prevent duplicates
-    let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-    rosters.forEach(function (rosterObj) {
-        if (rosterObj && typeof rosterObj.task === 'string' && typeof rosterObj.priority === 'string') {
-            const rosterDiv = document.createElement("div");
-            rosterDiv.classList.add("roster");
-
-            const newRoster = document.createElement("li");
-            newRoster.innerText = rosterObj.task;
-            newRoster.classList.add("roster-item");
-            newRoster.dataset.task = rosterObj.task; // Store original task name
-            rosterDiv.appendChild(newRoster);
-
-            const priorityLabel = document.createElement("span");
-            priorityLabel.innerText = rosterObj.priority;
-            priorityLabel.classList.add("priority-level", `priority-${rosterObj.priority.toLowerCase()}`);
-            rosterDiv.appendChild(priorityLabel);
-
-            const completedButton = document.createElement("button");
-            completedButton.innerHTML = '<i class="fas fa-check-circle"></i>';
-            completedButton.classList.add("complete-btn");
-            rosterDiv.appendChild(completedButton);
-
-            const editButton = document.createElement("button");
-            editButton.innerHTML = '<i class="fas fa-edit"></i>';
-            editButton.classList.add("edit-btn");
-            rosterDiv.appendChild(editButton);
-
-            const trashButton = document.createElement("button");
-            trashButton.innerHTML = '<i class="fas fa-trash"></i>';
-            trashButton.classList.add("trash-btn");
-            rosterDiv.appendChild(trashButton);
-
-            document.querySelector(".roster-list").appendChild(rosterDiv);
-        } else {
-            console.error("Invalid roster object:", rosterObj);
-        }
-    });
+    const rosters = JSON.parse(localStorage.getItem("rosters")) || [];
+    rosters.forEach(({ task, priority }) => createRosterElement(task, priority));
 }
 
-
-
-
 function removeLocalRosters(roster) {
-    let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
-    const rosterIndex = roster.children[0].innerText;
-    rosters = rosters.filter(roster => roster.task !== rosterIndex);
+    let rosters = JSON.parse(localStorage.getItem("rosters")) || [];
+    const task = roster.querySelector(".roster-item").innerText;
+    rosters = rosters.filter(roster => roster.task !== task);
     localStorage.setItem("rosters", JSON.stringify(rosters));
 }
 
 function updateLocalRosters(originalTask, newTask, newPriority) {
-    let rosters = localStorage.getItem("rosters") ? JSON.parse(localStorage.getItem("rosters")) : [];
+    let rosters = JSON.parse(localStorage.getItem("rosters")) || [];
     rosters = rosters.map(roster => roster.task === originalTask ? { task: newTask, priority: newPriority } : roster);
     localStorage.setItem("rosters", JSON.stringify(rosters));
 }
 
-
-
-
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
-    document.querySelector(".roster-input").classList.toggle("dark-mode");
-    document.querySelector(".roster-button").classList.toggle("dark-mode");
-    document.querySelector(".filter-roster").classList.toggle("dark-mode");
-    document.querySelector(".priority-select").classList.toggle("dark-mode");
-    document.querySelector(".search-bar").classList.toggle("dark-mode");
-
-    const rosters = document.querySelectorAll(".roster");
-    rosters.forEach(roster => {
-        roster.classList.toggle("dark-mode");
-        roster.querySelector(".priority-level").classList.toggle("dark-mode");
-    });
-
     saveDarkModePreference();
 }
 
@@ -224,27 +125,7 @@ function loadDarkMode() {
     const darkModeEnabled = localStorage.getItem("dark-mode") === "true";
     if (darkModeEnabled) {
         document.body.classList.add("dark-mode");
-        document.querySelector(".container").classList.add("dark-mode");
-        document.querySelector(".roster-input").classList.add("dark-mode");
-        document.querySelector(".roster-button").classList.add("dark-mode");
-        document.querySelector(".filter-roster").classList.add("dark-mode");
-        document.querySelector(".priority-select").classList.add("dark-mode");
-        document.querySelector(".search-bar").classList.add("dark-mode");
-
-        const rosters = document.querySelectorAll(".roster");
-        rosters.forEach(roster => {
-            roster.classList.add("dark-mode");
-            roster.querySelector(".priority-level").classList.add("dark-mode");
-        });
-    }
-}
-
-
-function loadDarkMode() {
-    const darkModeEnabled = localStorage.getItem("dark-mode") === "true";
-    if (darkModeEnabled) {
-        document.getElementById("dark-mode-toggle").checked = true;
-        toggleDarkMode();  // This will add all necessary dark mode classes
+        darkModeToggle.checked = true;
     }
 }
 
@@ -255,14 +136,42 @@ function saveDarkModePreference() {
 
 function searchRosters() {
     const searchTerm = searchBar.value.toLowerCase();
-    const rosters = rosterList.childNodes;
-
+    const rosters = Array.from(rosterList.children);
     rosters.forEach(roster => {
-        const rosterText = roster.querySelector(".roster-item").innerText.toLowerCase();
-        if (rosterText.includes(searchTerm)) {
-            roster.style.display = "flex";
-        } else {
-            roster.style.display = "none";
-        }
+        const task = roster.querySelector(".roster-item").innerText.toLowerCase();
+        roster.style.display = task.includes(searchTerm) ? "flex" : "none";
     });
+}
+
+function createRosterElement(task, priority) {
+    const rosterDiv = document.createElement("div");
+    rosterDiv.classList.add("roster");
+
+    const newRoster = document.createElement("li");
+    newRoster.innerText = task;
+    newRoster.classList.add("roster-item");
+    newRoster.dataset.task = task;
+    rosterDiv.appendChild(newRoster);
+
+    const priorityLabel = document.createElement("span");
+    priorityLabel.innerText = priority;
+    priorityLabel.classList.add("priority-level", `priority-${priority.toLowerCase()}`);
+    rosterDiv.appendChild(priorityLabel);
+
+    const completedButton = document.createElement("button");
+    completedButton.innerHTML = '<i class="fas fa-check-circle"></i>';
+    completedButton.classList.add("complete-btn");
+    rosterDiv.appendChild(completedButton);
+
+    const editButton = document.createElement("button");
+    editButton.innerHTML = '<i class="fas fa-edit"></i>';
+    editButton.classList.add("edit-btn");
+    rosterDiv.appendChild(editButton);
+
+    const trashButton = document.createElement("button");
+    trashButton.innerHTML = '<i class="fas fa-trash"></i>';
+    trashButton.classList.add("trash-btn");
+    rosterDiv.appendChild(trashButton);
+
+    rosterList.appendChild(rosterDiv);
 }
