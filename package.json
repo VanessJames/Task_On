@@ -1,25 +1,24 @@
 {
-  "name": "task_on",
+  "name": "this-will-work",
   "version": "1.0.0",
-  "description": "Task_On\r Task_On is a simple task management application that allows users to add and delete tasks. This project is built using plain HTML, CSS, and JavaScript.",
-  "main": "script.js",
+  "main": "index.js",
   "scripts": {
+    "devStart": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
-    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.19.2",
-    "express-rate-limit": "^7.2.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.4.0",
-    "validator": "^13.12.0"
+    "mongoose": "^8.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
   }
 }

@@ -5,7 +5,7 @@
 }
 
 body {
-    background: url('images/wood.jpg') no-repeat center center fixed; 
+    background: url('/images/wood.jpg') no-repeat center center fixed; 
     background-size: cover;
     color: white;
     font-family: "Poppins", sans-serif;
@@ -259,7 +259,7 @@ input:checked + .slider:before {
 
 /* Dark mode styles */
 body.dark-mode {
-    background: url('images/Dark wood.jpg') no-repeat center center fixed; 
+    background: url('/images/Dark\ wood.') no-repeat center center fixed; 
     background-size: cover;
     color: white;
 }
