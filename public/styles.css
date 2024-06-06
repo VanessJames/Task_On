@@ -264,8 +264,8 @@ body.dark-mode {
     color: white;
 }
 
-.priority-select.dark-mode, .priority-level.dark-mode, .search-bar.dark-mode,
-.roster-input.dark-mode, .roster-button.dark-mode, .select.dark-mode select.dark-mode, select.filter-roster.dark-mode {
+.priority-select.dark-mode, .search-bar.dark-mode,
+.roster-input.dark-mode, .roster-button.dark-mode, .select.dark-mode select.dark-mode, select.filter-roster.dark-mode, .roster.dark-mode {
     background-color: #555;
     color: #f9f9f9;
     border: 1px solid #666;

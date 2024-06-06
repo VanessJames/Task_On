@@ -118,6 +118,8 @@ function updateLocalRosters(originalTask, newTask, newPriority) {
 
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
+    const elements = document.querySelectorAll(".priority-select, .priority-level, .search-bar, .roster-input, .roster-button, .select select, select.filter-roster, .roster");
+    elements.forEach(el => el.classList.toggle("dark-mode"));
     saveDarkModePreference();
 }
 
@@ -126,8 +128,12 @@ function loadDarkMode() {
     if (darkModeEnabled) {
         document.body.classList.add("dark-mode");
         darkModeToggle.checked = true;
+        const elements = document.querySelectorAll(".priority-select, .priority-level, .search-bar, .roster-input, .roster-button, .select select, select.filter-roster, .roster");
+        elements.forEach(el => el.classList.add("dark-mode"));
     }
 }
+
+
 
 function saveDarkModePreference() {
     const darkModeEnabled = document.body.classList.contains("dark-mode");
@@ -146,6 +152,11 @@ function searchRosters() {
 function createRosterElement(task, priority) {
     const rosterDiv = document.createElement("div");
     rosterDiv.classList.add("roster");
+
+    // Check if dark mode is enabled and apply the class
+    if (document.body.classList.contains("dark-mode")) {
+        rosterDiv.classList.add("dark-mode");
+    }
 
     const newRoster = document.createElement("li");
     newRoster.innerText = task;
