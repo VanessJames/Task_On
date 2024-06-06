@@ -12,10 +12,28 @@ This is a simple task management application with user authentication, allowing 
 
 - Node.js
 - Express.js
+- EJS
 - MongoDB
 - Mongoose
-- JSON Web Token (JWT)
 - HTML, CSS, JavaScript (Frontend)
+
+project
+├── src
+│ ├── config.js
+│ └── index.js
+├── views
+│ ├── home.ejs
+│ ├── index.ejs
+│ ├── login.ejs
+│ └── signup.ejs
+├── public
+│ ├── images
+│ ├── script.js
+│ ├── style.css
+│ └── styles.css
+├── .gitignore
+├── package.json
+└── package-lock.json
 
 ## Installation
 
@@ -32,7 +50,7 @@ npm install
 
 Create a .env file in the root directory and add the following:
 MONGO_URI=your-mongodb-uri
-JWT_SECRET=your-jwt-secret
+PORT=5000;
 
 ## Start the server
 node index.js
@@ -47,12 +65,26 @@ Manage your tasks
 
 
 ## File Structure
-index.js - Entry point of the application
-models/ - Mongoose models (User, Task)
-routes/ - Express routes (auth, tasks)
-index.html - Main HTML file
-styles.css - CSS file for styling
-script.js - JavaScript file for frontend logic
+src: Contains the main server configuration and entry point.
+
+config.js: Configuration settings for the application.
+index.js: Main entry point for the application.
+views: Contains the EJS templates for rendering HTML pages.
+
+home.ejs: Home page view.
+index.ejs: Main index view.
+login.ejs: Login page view.
+signup.ejs: Signup page view.
+public: Contains public assets like JavaScript, CSS, and images.
+
+images: Directory for images used in the application.
+script.js: Main JavaScript file for client-side logic.
+style.css and styles.css: Stylesheets for the application.
+.gitignore: Specifies files and directories to be ignored by Git.
+
+package.json: Lists dependencies and scripts for the application.
+
+package-lock.json: Locks the versions of dependencies installed.
 
 
 ## Contributing
