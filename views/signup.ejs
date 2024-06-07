@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SignUp</title>
     <link rel="stylesheet" href="/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
 
@@ -12,16 +13,20 @@
         <h2>SignUp</h2>
         <form action="/signup" method="post">
           <div class="form-group">
-            <label for="name">Name:</label>
             <input type="text" id="name" name="username" placeholder="Enter your name" required autocomplete="off">
+            <i class='bx bx-user bx-fade-right' ></i>
           </div>
           <div class="form-group">
-            <label for="password">password:</label>
-            <input type="password" id="password" name="password" placeholder="password" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <i class='bx bx-lock-alt bx-tada' ></i>
           </div>
-          <button type="submit" class="submit-btn">Submit</button>
+          <div class="remember-forgot">
+            <label><input type="checkbox">Remember Me</label>
+            <a href="#">Forgot Password</a>
+          </div>
+          <button type="submit" class="submit-btn">SignUp</button>
         </form>
-        <p>Already have an account? <a class="link" href="/login">login</a></p>
+        <p>Already have an account? <a class="link" href="/login">Login</a></p>
       </div>
       <script src="/script.js"></script>
 </body>

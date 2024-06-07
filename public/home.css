@@ -1,0 +1,15 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+
+
+  body {
+    background: url('images/Home.jpg') no-repeat center center fixed; 
+    background-size: cover;
+    color: white;
+    font-family: "Poppins", sans-serif;
+    min-height: 100vh;
+}
